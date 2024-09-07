@@ -1,0 +1,40 @@
+services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:2020"
+    ports:
+      - "2020:2020"
+      - "2021:8080" # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - traefik-network
+
+  auth:
+    image: auth-service
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=Host(`auth.localhost`)"
+      - "traefik.http.routers.auth.entrypoints=web"
+      - "traefik.http.services.auth.loadbalancer.server.port=8000"
+    networks:
+      - traefik-network
+    env_file:
+      - .env
+    build:
+      context: .
+      args:
+        INSTALL_DEV: ${INSTALL_DEV-false}
+    platform: linux/amd64 # Patch for M1 Mac
+    volumes:
+      - ./:/app
+
+
+networks:
+  traefik-network:
+    name: traefik-network
+    external: true

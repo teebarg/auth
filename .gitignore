@@ -1,0 +1,14 @@
+__pycache__
+*.pyc
+.env
+venv/
+.vercel
+
+*.pyo
+.docker
+.git
+.env
+cred.json
+app.log
+
+.idea/
