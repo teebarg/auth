@@ -6,7 +6,7 @@ services:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --entrypoints.http.address=:2020
-      - --log.level=DEBUG  # Debug logging
+      # - --log.level=DEBUG  # Debug logging
     ports:
       - 2020:2020  # HTTP entrypoint
       - 2021:8080  # Traefik dashboard
