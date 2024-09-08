@@ -2,25 +2,36 @@ services:
   traefik:
     image: traefik:v2.10
     command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:2020"
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.http.address=:2020
+      # - --log.level=DEBUG  # Debug logging
     ports:
-      - "2020:2020"
-      - "2021:8080" # Traefik dashboard
+      - 2020:2020  # HTTP entrypoint
+      - 2021:8080  # Traefik dashboard
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - traefik-network
+    labels:
+      # Enable Traefik
+      - traefik.enable=true
+      # Dashboard route setup
+      - traefik.http.routers.traefik-dashboard.entrypoints=http
+      - traefik.http.routers.traefik-dashboard.rule=Host(`traefik.localhost`)
+      - traefik.http.services.traefik-dashboard.loadbalancer.server.port=8080
+      - traefik.http.routers.traefik-dashboard.service=api@internal
 
   auth:
     image: auth-service
+    container_name: auth
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.auth.rule=Host(`auth.localhost`)"
-      - "traefik.http.routers.auth.entrypoints=web"
-      - "traefik.http.services.auth.loadbalancer.server.port=8000"
+      - traefik.enable=true
+      # Route traffic on port 2020 to the auth service
+      - traefik.http.routers.auth-router.entrypoints=http
+      - traefik.http.routers.auth-router.rule=Host(`auth.localhost`)
+      - traefik.http.services.auth-service.loadbalancer.server.port=8000
     networks:
       - traefik-network
     env_file:
@@ -32,7 +43,6 @@ services:
     platform: linux/amd64 # Patch for M1 Mac
     volumes:
       - ./:/app
-
 
 networks:
   traefik-network:

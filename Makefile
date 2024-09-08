@@ -15,7 +15,10 @@ run:
 	uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 test:
-	pytest
+	POSTGRES_SERVER=null PROJECT_NAME=null FIRST_SUPERUSER_FIRSTNAME=null FIRST_SUPERUSER_LASTNAME=null FIRST_SUPERUSER=email@email.com FIRST_SUPERUSER_PASSWORD=null python -m pytest
+
+docker-test:
+	docker exec -it $(PROJECT_SLUG) make test
 
 format:
 	black .
