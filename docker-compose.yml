@@ -25,6 +25,7 @@ services:
 
   auth:
     image: auth-service
+    container_name: auth
     labels:
       - traefik.enable=true
       # Route traffic on port 2020 to the auth service

@@ -6,7 +6,7 @@ class TestUser:
         self, client: TestClient, normal_user_token_headers: dict[str, str]
     ):
         response = client.get("/api/users/me", headers=normal_user_token_headers)
-        assert response.status_code == 404
+        assert response.status_code == 200
 
     # def test_read_user_me_unauthenticated(self, unathenticated_client: TestClient):
     #     response = unathenticated_client.get("/api/users/me")
