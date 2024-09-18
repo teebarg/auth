@@ -2,10 +2,11 @@ from typing import Annotated, Generator, Union
 
 import crud
 import jwt
-from fastapi import Cookie, Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status
 from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
 from sqlmodel import Session
+from fastapi.security import APIKeyHeader
 
 from core import security
 from core.config import settings
@@ -23,10 +24,10 @@ def get_db() -> Generator:
 
 
 SessionDep = Annotated[Session, Depends(get_db)]
-TokenDep2 = Annotated[Union[str, None], Cookie()]
+TokenDep = Annotated[str, Depends(APIKeyHeader(name="X-Auth"))]
 
 
-def get_current_user(session: SessionDep, access_token: TokenDep2) -> User:
+def get_current_user(session: SessionDep, access_token: TokenDep) -> User:
     try:
         payload = jwt.decode(
             access_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
