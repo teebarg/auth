@@ -49,7 +49,7 @@ async def login(
     response: Response,
     db: deps.SessionDep,
     credentials: SignIn,
-) -> UserPublic:
+) -> Any:
     """
     OAuth2 compatible token login, get an access token for future requests
     """
@@ -74,7 +74,7 @@ async def login(
             httponly=True,
         )
 
-        return user
+        return {"user": user, "access_token": access_token}
     except Exception as e:
         logger.error(e)
         raise HTTPException(
